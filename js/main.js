@@ -8,13 +8,13 @@ let infowindow;
 
 // List of searches
 let searches  = [
-'movie_theater',
-'bus_station',
-'train_station',
-'shooping_mall',
-'taxi_stand',
-'travel_agency',
-'hospital'
+  'movie_theater',
+  'bus_station',
+  'train_station',
+  'shooping_mall',
+  'taxi_stand',
+  'travel_agency',
+  'hospital'
 ];
 
 
@@ -61,7 +61,8 @@ function showPosition(position) {
   var marker = new google.maps.Marker({
       position: latlng,
       map: map,
-      title:"You are here! (at least within a "+position.coords.accuracy+" meter radius)"
+      title:"You are here! (at least within a "+position.coords.accuracy+
+        " meter radius)"
   });
 
   var transitLayer = new google.maps.TransitLayer();
@@ -75,7 +76,7 @@ function showPosition(position) {
     console.log("Searching " + search);
     service.nearbySearch({
       location: latlng,
-      radius: 5000,
+      radius: 2000,
       type: search
     }, callback);
   }
@@ -95,13 +96,54 @@ function createMarker(place) {
   console.log(place);
   var placeLoc = place.geometry.location;
 
+  var temp = place.types;
+  let tempt;
+  for(let t of temp){
+    for(let tt of searches){
+      if(t == tt){
+        tempt = t;
+      }
+    }
+  }
+
+  let iconT;
+
+  if(tempt != undefined){
+    switch (tempt) {
+      case 'movie_theater':
+        iconT = "https://img.icons8.com/color/48/000000/two-tickets.png";
+        break;
+      case 'bus_station':
+        iconT = "https://img.icons8.com/color/48/000000/bus.png";
+        break;
+      case 'train_station':
+        iconT = "https://img.icons8.com/color/48/000000/train.png";
+        break;
+      case 'shooping_mall':
+        iconT = "https://img.icons8.com/color/48/000000/shopping-cart.png";
+        break;
+      case 'taxi_stand':
+        iconT = "https://img.icons8.com/color/48/000000/taxi.png";
+        break;
+      case 'travel_agency':
+        iconT = "https://img.icons8.com/color/48/000000/world-map.png";
+        break;
+      case 'hospital':
+        iconT = "https://img.icons8.com/color/48/000000/hospital.png";
+        break;
+    }
+  }else{
+    iconT = place.icon;
+  }
+
   var icon = {
-    url: place.icon, // url
-    scaledSize: new google.maps.Size(20, 20), // scaled size
+    url: iconT, // url
+    scaledSize: new google.maps.Size(35, 35), // scaled size
     origin: new google.maps.Point(0,0), // origin
     anchor: new google.maps.Point(0, 0) // anchor
   };
 
+  console.log(tempt);
   var marker = new google.maps.Marker({
     map: map,
     icon: icon,
@@ -109,9 +151,8 @@ function createMarker(place) {
   });
 
   google.maps.event.addListener(marker, 'click', function() {
-    infowindow.setContent('<div><strong>' + place.name + '</strong><br>' +
-                'Place ID: ' + place.place_id + '<br>' +
-                place.vicinity + '</div>');
+    infowindow.setContent('<div style="text-align: center;"><strong>' + place.name + '</strong><br>' +
+                 '<br>' + place.vicinity + '</div>');
     infowindow.open(map, this);
   });
 }
